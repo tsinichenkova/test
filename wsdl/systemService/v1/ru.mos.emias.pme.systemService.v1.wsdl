@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://emias.mos.ru/pme/systemService/v1/" xmlns:ns1="http://emias.mos.ru/pme/systemService/v1/types/" xmlns:uctx="http://emias.mos.ru/system/v1/userContext/" xmlns:nsf="http://emias.mos.ru/system/v1/faults/" name="systemService" targetNamespace="http://emias.mos.ru/pme/systemService/v1/">
+	<types>
+		<xsd:schema>
+			<xsd:import namespace="http://emias.mos.ru/system/v1/userContext/" schemaLocation="emias.system.v1.userContext.xsd"/>
+			<xsd:import namespace="http://emias.mos.ru/pme/systemService/v1/types/" schemaLocation="ru.mos.emias.pme.systemService.v1.types.xsd"/>
+			<xsd:import namespace="http://emias.mos.ru/system/v1/faults/" schemaLocation="emias.system.v1.faults.xsd"/>
+		</xsd:schema>
+	</types>
+	<message name="userContext">
+		<documentation>Контекст пользователя</documentation>
+		<part name="userContext" element="uctx:userContext"/>
+	</message>
+	<message name="fault">
+		<documentation>Ошибка</documentation>
+		<part name="fault" element="nsf:fault"/>
+	</message>
+	
+
+	<message name="createMassAssignmentsRequest">
+		<part name="parameters" element="ns1:createMassAssignmentsRequest"/>
+	</message>
+	<message name="createMassAssignmentsResponse">
+		<part name="parameters" element="ns1:createMassAssignmentsResponse"/>
+	</message>
+	<message name="createMassAssignmentsStatusRequest">
+		<part name="parameters" element="ns1:createMassAssignmentsStatusRequest"/>
+	</message>
+	<message name="createMassAssignmentsStatusResponse">
+		<part name="parameters" element="ns1:createMassAssignmentsStatusResponse"/>
+	</message>
+
+	<portType name="systemServicePortType">
+		<operation name="createMassAssignments">
+			<input name="createMassAssignmentsRequest" message="tns:createMassAssignmentsRequest"/>
+			<output name="createMassAssignmentsResponse" message="tns:createMassAssignmentsResponse"/>
+			<fault name="fault" message="tns:fault"/>
+		</operation>
+		<operation name="createMassAssignmentsStatus">
+			<input name="createMassAssignmentsStatusRequest" message="tns:createMassAssignmentsStatusRequest"/>
+			<output name="createMassAssignmentsStatusResponse" message="tns:createMassAssignmentsStatusResponse"/>
+			<fault name="fault" message="tns:fault"/>
+		</operation>
+	</portType>
+	<binding name="systemServiceBinding" type="tns:systemServicePortType">
+		<soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="createMassAssignments">
+			<soap12:operation soapAction="createMassAssignmentsRequest"/>
+			<input>
+				<soap12:header message="tns:userContext" part="userContext" use="literal"/>
+				<soap12:body use="literal"/>
+			</input>
+			<output>
+				<soap12:body use="literal"/>
+			</output>
+			<fault name="fault">
+				<soap12:fault name="fault" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="createMassAssignmentsStatus">
+			<soap12:operation soapAction="createMassAssignmentsStatusRequest"/>
+			<input>
+				<soap12:header message="tns:userContext" part="userContext" use="literal"/>
+				<soap12:body use="literal"/>
+			</input>
+			<output>
+				<soap12:body use="literal"/>
+			</output>
+			<fault name="fault">
+				<soap12:fault name="fault" use="literal"/>
+			</fault>
+		</operation>
+	</binding>
+	<service name="systemService" xmlns:wsp="http://www.w3.org/ns/ws-policy">
+		<port name="systemServicePort" binding="tns:systemServiceBinding">
+			<soap12:address location="REPLACE_WITH_ACTUAL_URL"/>
+			<wsp:PolicyReference URI="#authPolicy"/>
+		</port>
+	</service>
+	<wsp:Policy wsu:Id="authPolicy" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+		<sp:SupportingTokens xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+			<wsp:Policy>
+				<sp:UsernameToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+					<wsp:Policy>
+						<sp:NoPassword/>
+					</wsp:Policy>
+				</sp:UsernameToken>
+			</wsp:Policy>
+		</sp:SupportingTokens>
+	</wsp:Policy>
+</definitions>

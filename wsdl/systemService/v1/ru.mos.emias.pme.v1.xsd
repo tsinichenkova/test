@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://emias.mos.ru/pme/v1/" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		   targetNamespace="http://emias.mos.ru/pme/v1/"
+		   elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+	<xs:simpleType name="Sex">
+		<xs:annotation>
+			<xs:documentation>Пол пациента</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="FEMALE">
+				<xs:annotation>
+					<xs:documentation>Женщина</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MALE">
+				<xs:annotation>
+					<xs:documentation>Мужчина</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="CheckupPackageType">
+		<xs:annotation>
+			<xs:documentation>Тип пакета мероприятий</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="DISPANSERIZATION">
+				<xs:annotation>
+					<xs:documentation>Диспансеризационный пакет</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MEDICAL_CHECKUP">
+				<xs:annotation>
+					<xs:documentation>Медицинский осмотр</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PARK">
+				<xs:annotation>
+					<xs:documentation>Базовый пакет диспансеризации в парке</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="CheckupStatus">
+		<xs:annotation>
+			<xs:documentation>Статус проверки</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="complete">
+				<xs:annotation>
+					<xs:documentation>Проверка выполнена в текущем году</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="planned">
+				<xs:annotation>
+					<xs:documentation>По проверке имеется назначение в текущем году</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="incomplete">
+				<xs:annotation>
+					<xs:documentation>Проверка не выполнена и по проверке отсутствует назначение в текущем году</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="refusal">
+				<xs:annotation>
+					<xs:documentation>Отказано в выполнении проверки</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="ValuesRange">
+		<xs:attribute name="min" type="xs:long">
+			<xs:annotation>
+				<xs:documentation>Левая граница диапазона (включительно)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="max" type="xs:long">
+			<xs:annotation>
+				<xs:documentation>Правая граница диапазона (включительно)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:simpleType name="ThemeName">
+		<xs:annotation>
+			<xs:documentation>Наименование тематического направления использования пакета</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="GENERAL">
+				<xs:annotation>
+					<xs:documentation>Общая диспансеризация</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PARK">
+				<xs:annotation>
+					<xs:documentation>Диспансеризация в парках</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

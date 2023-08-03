@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jaxb:bindings xmlns="http://java.sun.com/xml/ns/jaxb"
+               xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+               xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+               xmlns:xs="http://www.w3.org/2001/XMLSchema"
+               jaxb:extensionBindingPrefixes="xjc"
+               jaxb:version="2.1">
+    <jaxb:bindings>
+        <jaxb:globalBindings>
+            <xjc:javaType name="java.time.LocalDate" xmlType="xs:date"
+                          adapter="soap.DateTimeJava"/>
+            <xjc:javaType name="org.joda.time.DateTime" xmlType="xs:dateTime"
+                          adapter="soap.DateTimeISO8601Marshaller"/>
+        </jaxb:globalBindings>
+    </jaxb:bindings>
+</jaxb:bindings>

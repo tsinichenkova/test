@@ -1,0 +1,202 @@
+plugins {
+    id 'java'
+    id 'idea'
+}
+
+group 'pme'
+version '1.0-SNAPSHOT'
+apply plugin: 'java'
+apply plugin: 'java-library'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+
+    maven {
+        url = 'https://artifactory.infinnity.ru/inf-release'
+    }
+    maven {
+        url = 'https://artifactory.infinnity.ru/fb-mvn-release-cache'
+    }
+    maven {
+        url = 'https://artifactory.infinnity.ru/libs-mvn-local'
+    }
+}
+
+java {
+    withSourcesJar()
+}
+
+
+ext {
+    versions = [
+            esu_producer_lib     : '2.0.2',
+            lombok               : '1.18.22',
+            rest_assured         : '4.4.0',
+            jackson              : '2.13.1',
+            assertj_core         : '3.21.0',
+            commons_io           : '2.5',
+            junit                : '4.12',
+            selenium             : '3.141.59',
+            browsermob_core      : '2.1.5',
+            hibernate_core       : '5.3.7.Final',
+            postgresql           : '42.2.8',
+            httpclient           : '4.5.10',
+            ojdbc8               : '21.1.0.0',
+            hamcrest             : '2.1',
+            log4j_core           : '2.11.0',
+            rt                   : '2.3.5'
+
+    ]
+
+    libraries = [
+            esu_producer_lib                 : "ru.mos.emias.esu:esu-producer-lib:${versions.esu_producer_lib}",
+            log4j_core                       : "org.apache.logging.log4j:log4j-core:${versions.log4j_core}",
+            rt                               : "com.sun.xml.ws:rt:${versions.rt}",
+            inf_common                       : "ru.mos.emias:inf-common:${versions.inf_common}",
+            lombok                           : "org.projectlombok:lombok:${versions.lombok}",
+            rest_assured                     : "io.rest-assured:rest-assured:${versions.rest_assured}",
+            assertj_core                     : "org.assertj:assertj-core:${versions.assertj_core}",
+            commons_io                       : "commons-io:commons-io:${versions.commons_io}",
+            junit                            : "junit:junit:${versions.junit}",
+            selenium                         : "org.seleniumhq.selenium:selenium-java:${versions.selenium}",
+            browsermob_core                  : "net.lightbody.bmp:browsermob-core:${versions.browsermob_core}",
+            hibernate_core                   : "org.hibernate:hibernate-core:${versions.hibernate_core}",
+            postgresql                       : "org.postgresql:postgresql:${versions.postgresql}",
+            httpclient                       : "org.apache.httpcomponents:httpclient:${versions.httpclient}",
+            ojdbc8                           : "com.oracle.database.jdbc:ojdbc8:${versions.ojdbc8 }",
+            hamcrest                         : "org.hamcrest:hamcrest:${versions.hamcrest}",
+
+            jackson_core                     : "com.fasterxml.jackson.core:jackson-core:${versions.jackson}",
+            jackson_databind                 : "com.fasterxml.jackson.core:jackson-databind:${versions.jackson}",
+            jackson_datatype_joda            : "com.fasterxml.jackson.datatype:jackson-datatype-joda:${versions.jackson}",
+            jackson_datatype_jsr310          : "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${versions.jackson}",
+            jackson_annotations              : "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}"
+    ]
+}
+
+configurations {
+    all*.exclude group: "com.sun.xml.ws", module: "jaxws-rt"
+    all*.exclude group: "org.slf4j", module: "slf4j-simple"     // log4j is the configured backend
+    all*.exclude group: "org.slf4j", module: "log4j-over-slf4j" // allow using log4j 2.x
+    cxf
+}
+
+dependencies {
+    implementation libraries.esu_producer_lib
+    implementation libraries.log4j_core
+    implementation libraries.rt
+    implementation libraries.lombok
+    implementation libraries.rest_assured
+    implementation libraries.assertj_core
+    implementation libraries.commons_io
+    implementation libraries.junit
+    implementation libraries.selenium
+    implementation libraries.browsermob_core
+    implementation libraries.hibernate_core
+    implementation libraries.postgresql
+    implementation libraries.httpclient
+    implementation libraries.ojdbc8
+    implementation libraries.hamcrest
+    implementation libraries.lombok
+
+    implementation libraries.jackson_core
+    implementation libraries.jackson_databind
+    implementation libraries.jackson_datatype_joda
+    implementation libraries.jackson_datatype_jsr310
+
+    compileOnly libraries.lombok
+    annotationProcessor libraries.lombok
+
+    testCompileOnly libraries.lombok
+    testAnnotationProcessor libraries.lombok
+
+    cxf 'org.apache.cxf:cxf-tools-wsdlto-core:3.3.2'
+    cxf  'org.apache.cxf:cxf-tools-wsdlto-frontend-jaxws:3.3.2'
+    cxf 'org.apache.cxf:cxf-tools-wsdlto-databinding-jaxb:3.3.2'
+    cxf 'jakarta.xml.ws:jakarta.xml.ws-api:3.0.1'
+    cxf  'org.slf4j:slf4j-simple:1.7.32'
+    cxf  'javax.annotation:javax.annotation-api:1.3.2'
+}
+
+def soapGeneratedJava = "$buildDir/generated/sources/main/java"
+def wsdlResultPath = "$buildDir/resources/main/wsdl"
+
+def wsdl2JavaFillArgs = { JavaExec javaExec, String wsdlFile, String wsdlLocation, String outputDirPath ->
+    javaExec.inputs.file file(wsdlFile)
+    javaExec.systemProperties = ['javax.xml.accessExternalSchema': 'all', 'file.encoding': 'UTF8']
+
+    javaExec.mainClass.set 'org.apache.cxf.tools.wsdlto.WSDLToJava'
+    javaExec.classpath = project.configurations.cxf
+    javaExec.outputs.dir outputDirPath
+
+    def outputDir = file("$soapGeneratedJava")
+
+    javaExec.args '-d', outputDir
+    javaExec.args '-quiet'
+    javaExec.args '-validate'
+    javaExec.args '-verbose'
+    javaExec.args '-suppress-generated-date'
+    javaExec.args '-b', "${wsdlResultPath}/xjb/dateTime.xjb"
+    javaExec.args '-wsdlLocation', wsdlLocation
+    javaExec.args '-noAddressBinding'
+    javaExec.args '-exsh', 'true'
+    javaExec.args wsdlFile
+}
+
+task wsdl2JavaSimiV5(type: JavaExec) {
+    group = 'code generation'
+    description = 'Generates java files for SimiV5'
+
+    def localWsdlPath = "/simiV5/simiService.wsdl"
+    def wsdlFile = "${wsdlResultPath}${localWsdlPath}"
+    def outputDirPath = "${soapGeneratedJava}/ru/mos/emias/simi/"
+
+    wsdl2JavaFillArgs(it, wsdlFile, localWsdlPath, outputDirPath)
+}
+
+
+task copyInternalSchemas(type: Copy) {
+    group = 'code generation'
+    description = 'Copies WSDL/xjb'
+
+    from "$projectDir/wsdl"
+    into wsdlResultPath
+}
+
+task wsdl2JavaSystemServiceV1(type: JavaExec) {
+    group = 'code generation'
+    description = 'Generates java files for SimiV5'
+
+    def localWsdlPath = "/systemService/v1/systemServiceV1.wsdl"
+    def wsdlFile = "${wsdlResultPath}${localWsdlPath}"
+    def outputDirPath = "${soapGeneratedJava}/ru/mos/emias/systemService/"
+
+    wsdl2JavaFillArgs(it, wsdlFile, localWsdlPath, outputDirPath)
+}
+
+task prepareSoapAll {
+    group = 'code generation'
+    description = 'Generates java files all SOAP clients'
+
+    dependsOn copyInternalSchemas, wsdl2JavaSimiV5, wsdl2JavaSystemServiceV1
+}
+
+wsdl2JavaSimiV5.mustRunAfter copyInternalSchemas, processResources
+wsdl2JavaSystemServiceV1.mustRunAfter copyInternalSchemas, processResources
+
+compileJava.dependsOn prepareSoapAll
+sourcesJar.dependsOn compileJava
+
+sourceSets {
+    main {
+        java {
+            srcDirs file(soapGeneratedJava)
+        }
+    }
+
+}
